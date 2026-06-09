@@ -56,7 +56,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/Button/Button';
 import { TreeSelect } from './Components/TreeSelect/TreeSelect.jsx';
 import '../ComponentManagerTab/styles.scss';
-
 const INSPECTOR_HEADER_OPTIONS = [
   {
     label: 'Inspect',
@@ -150,6 +149,7 @@ export const NEW_REVAMPED_COMPONENTS = [
   'ColorPicker',
   'FileButton',
   'ButtonGroupV2',
+  'FlexContainer',
 ];
 
 export const Inspector = ({
@@ -534,6 +534,7 @@ export const Inspector = ({
         darkMode={darkMode}
         pages={pages}
         allComponents={allComponents}
+        selectedComponentId={selectedComponentId}
       />
     </div>
   );
