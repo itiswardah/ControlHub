@@ -16,6 +16,7 @@ import { debounce } from 'lodash';
 import posthogHelper from '@/modules/common/helpers/posthogHelper';
 import { useAppDataStore } from '@/_stores/appDataStore';
 import AITripleSparkles from '@/_ui/Icon/solidIcons/AITripleSparkles';
+import { useIsAiBlockedOnDefaultBranch } from '@/_hooks/useIsAiBlockedOnDefaultBranch';
 
 const GENERATE_QUERY_SUPPORTED_KINDS = [
   'postgresql',
@@ -30,7 +31,7 @@ const GENERATE_QUERY_SUPPORTED_KINDS = [
 ];
 
 export const QueryManagerHeader = forwardRef(({ darkMode, setActiveTab, activeTab }, ref) => {
-  const { moduleId } = useModuleContext();
+  const { moduleId, isModuleEditor } = useModuleContext();
   const updateQuerySuggestions = useStore((state) => state.queryPanel.updateQuerySuggestions);
   const previewQuery = useStore((state) => state.queryPanel.previewQuery);
   const renameQuery = useStore((state) => state.dataQuery.renameQuery);
@@ -40,7 +41,7 @@ export const QueryManagerHeader = forwardRef(({ darkMode, setActiveTab, activeTa
   const showCreateQuery = useStore((state) => state.queryPanel.showCreateQuery);
   const setShowCreateQuery = useStore((state) => state.queryPanel.setShowCreateQuery);
   const queryName = selectedQuery?.name ?? '';
-  const shouldFreeze = useStore((state) => state.getShouldFreeze());
+  const shouldFreeze = useStore((state) => state.getShouldFreeze(false, isModuleEditor));
 
   useEffect(() => {
     if (selectedQuery?.name) {
@@ -168,7 +169,8 @@ export const QueryManagerHeader = forwardRef(({ darkMode, setActiveTab, activeTa
 });
 
 const NameInput = ({ onInput, value, darkMode, isDiabled, selectedQuery }) => {
-  const shouldFreeze = useStore((state) => state.getShouldFreeze());
+  const { isModuleEditor } = useModuleContext();
+  const shouldFreeze = useStore((state) => state.getShouldFreeze(false, isModuleEditor));
   const isFocused = useStore((state) => state.queryPanel.nameInputFocused, shallow);
   const setIsFocused = useStore((state) => state.queryPanel.setNameInputFocused, shallow);
   const [name, setName] = useState(value);
@@ -309,6 +311,7 @@ const GenerateQueryButton = () => {
   // Derived boolean so the component only re-renders when mention is added/removed, not on every keystroke
   const isQueryMentioned = useStore((state) => hasQueryMention(state.ai?.inputMessage ?? '', queryName));
   const [buttonPressedForQuery, setButtonPressedForQuery] = useState(null);
+  const isAiBlockedByBranch = useIsAiBlockedOnDefaultBranch();
 
   if (!featureAccess?.ai) return null;
   if (!GENERATE_QUERY_SUPPORTED_KINDS.includes(selectedDataSource?.kind)) return null;
@@ -357,7 +360,7 @@ const GenerateQueryButton = () => {
           aria-selected={isPressed}
           className={isPressed ? '!tw-bg-button-outline-hover' : ''}
           onClick={handleGenerateQuery}
-          disabled={shouldFreeze}
+          disabled={shouldFreeze || isAiBlockedByBranch}
           data-cy="query-generate-button"
         >
           <AITripleSparkles width="14" height="14" />

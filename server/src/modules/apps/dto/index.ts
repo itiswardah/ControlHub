@@ -27,12 +27,20 @@ export class AppCreateDto {
   @IsOptional()
   @IsString()
   prompt?: string;
+
+  @IsOptional()
+  @IsUUID()
+  branchId?: string;
 }
 
 export class AppUpdateDto {
   @IsString()
   @IsOptional()
   current_version_id: string;
+
+  @IsString()
+  @IsOptional()
+  editingVersionId: string;
 
   @IsBoolean()
   @IsOptional()
@@ -62,6 +70,10 @@ export class AppUpdateDto {
   @Transform(({ value }) => sanitizeInput(value))
   icon: string;
 
+  @IsString()
+  @IsOptional()
+  branch_id?: string;
+
   @IsOptional()
   @IsEnum(AppBuilderMode, { message: 'app_builder_mode must be either "ai" or "visual"' })
   app_builder_mode?: AppBuilderMode;
@@ -87,6 +99,10 @@ export class ValidateAppAccessDto {
   @IsString()
   @IsOptional()
   envId: string;
+
+  @IsString()
+  @IsOptional()
+  branchId?: string;
 }
 
 @Exclude()
@@ -129,6 +145,10 @@ export class AppListDto {
   @IsString()
   @IsOptional()
   type: string;
+
+  @IsOptional()
+  @IsUUID()
+  branchId?: string;
 }
 
 export class VersionReleaseDto {
